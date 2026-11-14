@@ -42,7 +42,7 @@ jobs:
           mkdir -p release-assets
           cp dist/bin/sentinel "release-assets/$asset"
           echo "asset=$asset" >> "$GITHUB_OUTPUT"
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: sentinel-${{ matrix.platform }}
           path: release-assets/${{ steps.binary.outputs.asset }}
