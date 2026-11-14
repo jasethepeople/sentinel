@@ -1,0 +1,11 @@
+name: simulate_cwe_context
+category: reporting
+backend: fixture
+fixture_id: fixture_cwe_context
+description: Return fixed example CWE context; no external source is queried.
+target_parameter: target
+parameters: {}
+safety:
+  destructive: false
+  requires_approval: false
+  max_runtime_seconds: 1

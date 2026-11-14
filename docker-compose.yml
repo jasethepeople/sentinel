@@ -1,0 +1,25 @@
+services:
+  sentinel:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: sentinel:local
+    user: "10001:10001"
+    working_dir: /data
+    read_only: true
+    network_mode: none
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,size=16m
+    volumes:
+      - sentinel_data:/data
+    environment:
+      SENTINEL_SCOPE_FILE: /data/scope.yaml
+      SENTINEL_PUBLIC_KEY: /data/scope-signing-key.pub
+      SENTINEL_AUDIT_DB: /data/sentinel-audit.sqlite3
+
+volumes:
+  sentinel_data:

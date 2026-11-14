@@ -1,0 +1,82 @@
+[build-system]
+requires = ["hatchling>=1.27,<2"]
+build-backend = "hatchling.build"
+
+[project]
+name = "sentinel-security-simulation"
+version = "0.1.0"
+description = "A signed-scope LangGraph security simulation platform with offline-only fixtures"
+readme = "README.md"
+requires-python = ">=3.12,<3.14"
+license = "MIT"
+authors = [{ name = "SENTINEL contributors" }]
+keywords = ["security", "langgraph", "mcp", "mock", "scope-enforcement"]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Environment :: Console",
+  "Intended Audience :: Information Technology",
+  "License :: OSI Approved :: MIT License",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Topic :: Security",
+]
+dependencies = [
+  "cryptography>=50,<51",
+  "langgraph>=1,<2",
+  "langgraph-checkpoint-sqlite>=3,<4",
+  "mcp>=1.30,<2",
+  "networkx>=3.4,<4",
+  "pydantic>=2.11,<3",
+  "pyyaml>=6,<7",
+  "rich>=14,<15",
+  "typer>=0.15,<1",
+]
+
+[project.optional-dependencies]
+dev = [
+  "build>=1.2,<2",
+  "mypy>=1.15,<2",
+  "pip-audit>=2.8,<3",
+  "pyinstaller>=6.12,<7",
+  "pytest>=9.0.3,<10",
+  "pytest-cov>=6,<7",
+  "ruff>=0.11,<1",
+  "types-networkx>=3.4,<4",
+  "types-PyYAML>=6,<7",
+]
+
+[project.scripts]
+sentinel = "sentinel.cli.app:main"
+sentinel-mcp = "sentinel.mcp_gateway.server:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/sentinel"]
+
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra --strict-markers --strict-config"
+
+[tool.ruff]
+line-length = 120
+target-version = "py312"
+src = ["src"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "S"]
+ignore = ["B008", "S101"]
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+mypy_path = "src"
+packages = ["sentinel"]
+
+[tool.coverage.run]
+branch = true
+source = ["sentinel"]
+
+[tool.coverage.report]
+show_missing = true
+fail_under = 80

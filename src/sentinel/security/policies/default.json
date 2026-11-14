@@ -1,0 +1,8 @@
+{
+  "default": "deny",
+  "roles": {
+    "operator": {"allow_categories": ["recon", "scanning", "reporting"]},
+    "admin": {"allow_categories": ["recon", "scanning", "reporting"]}
+  },
+  "disabled_actions": ["dos", "credential_attack", "destructive_exploit", "shell_execution", "live_scanning", "exploitation"]
+}

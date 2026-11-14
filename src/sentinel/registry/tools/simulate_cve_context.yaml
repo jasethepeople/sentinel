@@ -1,0 +1,11 @@
+name: simulate_cve_context
+category: reporting
+backend: fixture
+fixture_id: fixture_cve_context
+description: Return fixed example CVE context; no external source is queried.
+target_parameter: target
+parameters: {}
+safety:
+  destructive: false
+  requires_approval: false
+  max_runtime_seconds: 1

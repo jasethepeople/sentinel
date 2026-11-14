@@ -1,0 +1,11 @@
+name: simulate_dependency_advisories
+category: scanning
+backend: fixture
+fixture_id: fixture_dependency_advisories
+description: Return fixed sample advisory data; no manifests are read.
+target_parameter: target
+parameters: {}
+safety:
+  destructive: false
+  requires_approval: false
+  max_runtime_seconds: 1

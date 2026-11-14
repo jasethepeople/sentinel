@@ -1,0 +1,74 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  build-binary:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: ubuntu-latest
+            platform: linux
+          - runner: macos-latest
+            platform: macos
+    runs-on: ${{ matrix.runner }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+      - run: uv sync --locked --extra dev
+      - run: uv run ruff check .
+      - run: uv run mypy src/sentinel
+      - run: uv run pytest --cov=sentinel
+      - run: bash scripts/audit-dependencies.sh
+      - run: bash scripts/build-binary.sh
+      - name: Name the binary for its actual runner architecture
+        id: binary
+        shell: bash
+        run: |
+          set -euo pipefail
+          asset="sentinel-${{ matrix.platform }}-$(uname -m)"
+          mkdir -p release-assets
+          cp dist/bin/sentinel "release-assets/$asset"
+          echo "asset=$asset" >> "$GITHUB_OUTPUT"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: sentinel-${{ matrix.platform }}
+          path: release-assets/${{ steps.binary.outputs.asset }}
+          if-no-files-found: error
+
+  publish:
+    needs: build-binary
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/download-artifact@v4
+        with:
+          path: release-assets
+      - name: Create source archive and checksums
+        shell: bash
+        run: |
+          set -euo pipefail
+          version="${GITHUB_REF_NAME#v}"
+          mkdir -p release
+          git archive --format=zip --prefix=sentinel/ "$GITHUB_REF" > "release/sentinel-${version}-source.zip"
+          cp release-assets/sentinel-linux/sentinel-linux-* release/
+          cp release-assets/sentinel-macos/sentinel-macos-* release/
+          (cd release && sha256sum * > SHA256SUMS)
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: release/*
+          generate_release_notes: true
